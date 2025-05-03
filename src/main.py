@@ -4,6 +4,11 @@ from utils.logger import setup_logger
 import os
 
 def main():
+    """
+    Loads an image from the input directory and saves it to the output directory with logging.
+    
+    Attempts to load an image file, save it to a new location, and logs each step. Logs an error message if any exception occurs during the process.
+    """
     logger = setup_logger()
 
     input_path = os.path.join("data", "input", "croco.jpeg")

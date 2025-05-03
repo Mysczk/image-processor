@@ -2,6 +2,17 @@ import logging
 import os
 
 def setup_logger(log_file="image_processor.log"):
+    """
+    Configures and returns a logger for image processing tasks.
+    
+    Creates a logger named "ImageProcessorLogger" with both file and console handlers. Log files are stored in the "logs" directory, with file logs capturing DEBUG and higher level messages and console output showing INFO and higher. Both handlers use a consistent timestamped format.
+    
+    Args:
+        log_file: Name of the log file to write logs to within the "logs" directory.
+    
+    Returns:
+        A configured logging.Logger instance.
+    """
     os.makedirs("logs", exist_ok=True)
     logger = logging.getLogger("ImageProcessorLogger")
     logger.setLevel(logging.DEBUG)
