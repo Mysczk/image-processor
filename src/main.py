@@ -6,8 +6,24 @@ import os
 def main():
     logger = setup_logger()
 
-    input_path = os.path.join("data", "input", "croco.jpeg")
-    output_path = os.path.join("data", "output", "croco.jpg")
+    import argparse
+
+    # Setup at the beginning of main()
+    parser = argparse.ArgumentParser(description='Process images.')
+    parser.add_argument(
+        '--input',
+        default=os.path.join("data", "input", "croco.jpeg"),
+        help='Path to input image'
+    )
+    parser.add_argument(
+        '--output',
+        default=os.path.join("data", "output", "croco.jpg"),
+        help='Path to output image'
+    )
+    args = parser.parse_args()
+
+    input_path = args.input
+    output_path = args.output
     try:
         logger.info(f"Loading file from {input_path}")
         image = load_image(input_path)
