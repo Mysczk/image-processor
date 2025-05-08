@@ -2,14 +2,22 @@ import numpy as np
 from PIL import Image
 
 def apply_convolution(image, kernel):
+    # Validate input
+    if not isinstance(image, Image.Image):
+        raise TypeError("Input must be a PIL Image object")
+    if not isinstance(kernel, np.ndarray) or kernel.ndim != 2:
+        raise TypeError("Kernel must be a 2D NumPy array")
+        
     image_array = np.array(image.convert("L"))  # grayscale
     kernel_height, kernel_width = kernel.shape
-    padded_image = np.pad(image_array, ((1, 1), (1, 1)), mode='constant')
-    output = np.zeros_like(image_array)
-
-    for i in range(image_array.shape[0]):
-        for j in range(image_array.shape[1]):
-            region = padded_image[i:i+kernel_height, j:j+kernel_width]
-            output[i, j] = np.clip(np.sum(region * kernel), 0, 255)
+    # Calculate padding dynamically based on kernel size
+    pad_h = kernel_height // 2
+    pad_w = kernel_width // 2
+    padded_image = np.pad(image_array, ((pad_h, pad_h), (pad_w, pad_w)), mode='constant')
+    
+    # Use scipy for efficient convolution
+    from scipy import signal
+    output = signal.convolve2d(image_array, kernel, mode='same', boundary='fill', fillvalue=0)
+    output = np.clip(output, 0, 255).astype(np.uint8)
 
     return Image.fromarray(output)
