@@ -7,6 +7,10 @@ import os
 import argparse
 import numpy as np
 
+SHARPEN_KERNEL = np.array([[0, -1, 0],
+                           [-1, 5, -1],
+                           [0, -1, 0]])
+
 def list_filters():
     print("\nAvailable filters:")
     print("1 - Grayscale")
@@ -35,10 +39,7 @@ def apply_selected_filters(image, filters, output_dir, logger):
 
         elif f in ["4", "convolution"]:
             logger.info("Applying Convolution (Sharpening)")
-            sharpen_kernel = np.array([[0, -1, 0],
-                                       [-1, 5, -1],
-                                       [0, -1, 0]])
-            result = convolution.apply_convolution(image, sharpen_kernel)
+            result = convolution.apply_convolution(image, SHARPEN_KERNEL)
             save_image(result, os.path.join(output_dir, f"output_convolution.jpg"))
 
         elif f in ["5", "hist_eq"]:
