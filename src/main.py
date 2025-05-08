@@ -27,16 +27,14 @@ FILTER_MAP = {
 }
 
 def list_filters():
-    print("""
-Available filters:
-1 - Grayscale
-2 - Sepia
-3 - Invert
-4 - Convolution (Sharpening)
-5 - Histogram Equalization
-6 - Edge Detection
-0 - Start processing
-""")
+    print("\nAvailable filters:")
+    # Filter numeric keys and sort them
+    numeric_keys = sorted([k for k in FILTER_MAP.keys() if k.isdigit()],
+                          key=int)
+    for key in numeric_keys:
+        label = FILTER_MAP[key][0]
+        print(f"{key} - {label}")
+    print("0 - Start processing\n")
 
 def apply_selected_filters(image, filters, output_dir, logger):
     for f in filters:
