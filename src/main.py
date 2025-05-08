@@ -11,47 +11,46 @@ SHARPEN_KERNEL = np.array([[0, -1, 0],
                            [-1, 5, -1],
                            [0, -1, 0]])
 
+FILTER_MAP = {
+    "1": ("Grayscale", lambda img: grayscale.apply_grayscale(img), "output_grayscale.jpg"),
+    "grayscale": ("Grayscale", lambda img: grayscale.apply_grayscale(img), "output_grayscale.jpg"),
+    "2": ("Sepia", lambda img: sepia.apply_sepia(img), "output_sepia.jpg"),
+    "sepia": ("Sepia", lambda img: sepia.apply_sepia(img), "output_sepia.jpg"),
+    "3": ("Invert", lambda img: invert.apply_invert(img), "output_invert.jpg"),
+    "invert": ("Invert", lambda img: invert.apply_invert(img), "output_invert.jpg"),
+    "4": ("Convolution (Sharpening)", lambda img: convolution.apply_convolution(img, SHARPEN_KERNEL), "output_convolution.jpg"),
+    "convolution": ("Convolution (Sharpening)", lambda img: convolution.apply_convolution(img, SHARPEN_KERNEL), "output_convolution.jpg"),
+    "5": ("Histogram Equalization", lambda img: histogram_equalization.equalize_histogram(img), "output_hist_eq.jpg"),
+    "hist_eq": ("Histogram Equalization", lambda img: histogram_equalization.equalize_histogram(img), "output_hist_eq.jpg"),
+    "6": ("Edge Detection", lambda img: edge_detection.detect_edges(img), "output_edges.jpg"),
+    "edges": ("Edge Detection", lambda img: edge_detection.detect_edges(img), "output_edges.jpg"),
+}
+
 def list_filters():
-    print("\nAvailable filters:")
-    print("1 - Grayscale")
-    print("2 - Sepia")
-    print("3 - Invert")
-    print("4 - Convolution (Sharpening)")
-    print("5 - Histogram Equalization")
-    print("6 - Edge Detection")
+    print("""
+Available filters:
+1 - Grayscale
+2 - Sepia
+3 - Invert
+4 - Convolution (Sharpening)
+5 - Histogram Equalization
+6 - Edge Detection
+0 - Start processing
+""")
 
 def apply_selected_filters(image, filters, output_dir, logger):
-    for i, f in enumerate(filters, start=1):
-        if f in ["1", "grayscale"]:
-            logger.info("Applying Grayscale")
-            result = grayscale.apply_grayscale(image)
-            save_image(result, os.path.join(output_dir, f"output_grayscale.jpg"))
-
-        elif f in ["2", "sepia"]:
-            logger.info("Applying Sepia")
-            result = sepia.apply_sepia(image)
-            save_image(result, os.path.join(output_dir, f"output_sepia.jpg"))
-
-        elif f in ["3", "invert"]:
-            logger.info("Applying Invert")
-            result = invert.apply_invert(image)
-            save_image(result, os.path.join(output_dir, f"output_invert.jpg"))
-
-        elif f in ["4", "convolution"]:
-            logger.info("Applying Convolution (Sharpening)")
-            result = convolution.apply_convolution(image, SHARPEN_KERNEL)
-            save_image(result, os.path.join(output_dir, f"output_convolution.jpg"))
-
-        elif f in ["5", "hist_eq"]:
-            logger.info("Applying Histogram Equalization")
-            result = histogram_equalization.equalize_histogram(image)
-            save_image(result, os.path.join(output_dir, f"output_hist_eq.jpg"))
-
-        elif f in ["6", "edges"]:
-            logger.info("Applying Edge Detection")
-            result = edge_detection.detect_edges(image)
-            save_image(result, os.path.join(output_dir, f"output_edges.jpg"))
-
+    for f in filters:
+        key = f.lower()
+        if key in FILTER_MAP:
+            label, func, filename = FILTER_MAP[key]
+            try:
+                logger.info(f"Applying {label}")
+                result = func(image)
+                save_path = os.path.join(output_dir, filename)
+                save_image(result, save_path)
+                logger.info(f"Saved result to {save_path}")
+            except Exception as e:
+                logger.error(f"Failed to apply {label}: {e}")
         else:
             logger.warning(f"Unknown filter: {f}")
 
@@ -63,40 +62,42 @@ def interactive_mode(image, output_dir, logger):
         if choice == "0":
             break
         selected_filters.append(choice)
-
-    apply_selected_filters(image, selected_filters, output_dir, logger)
-    logger.info("Processing complete. Results saved.")
+    if not selected_filters:
+        logger.info("No filters selected.")
+    else:
+        apply_selected_filters(image, selected_filters, output_dir, logger)
+        logger.info("Processing complete. Results saved.")
 
 def main():
     logger = setup_logger()
 
     parser = argparse.ArgumentParser(description='Command-line Photo Editor.')
-    parser.add_argument('--input', type=str, help='Path to the input image', required=True)
-    parser.add_argument('--output_dir', type=str, help='Path to the output directory', required=True)
+    parser.add_argument('--input', type=str, required=True, help='Path to the input image')
+    parser.add_argument('--output_dir', type=str, required=True, help='Path to the output directory')
     parser.add_argument('--filters', nargs='+', help='List of filters by number or name')
     parser.add_argument('--interactive', action='store_true', help='Run in interactive mode')
-
     args = parser.parse_args()
 
     if not os.path.exists(args.input):
-        logger.error("Input image does not exist.")
+        logger.error(f"Input image '{args.input}' does not exist.")
         return
 
-    if not os.path.exists(args.output_dir):
-        os.makedirs(args.output_dir)
-        logger.info(f"Created output directory: {args.output_dir}")
+    os.makedirs(args.output_dir, exist_ok=True)
+    logger.info(f"Output directory: {args.output_dir}")
 
-    image = load_image(args.input)
+    try:
+        image = load_image(args.input)
+    except Exception as e:
+        logger.error(f"Failed to load image: {e}")
+        return
 
     if args.interactive:
         interactive_mode(image, args.output_dir, logger)
-
     elif args.filters:
         apply_selected_filters(image, args.filters, args.output_dir, logger)
         logger.info("Processing complete. Results saved.")
-
     else:
-        print("\nYou must specify either --filters or --interactive")
+        logger.warning("No filters specified. Use --filters or --interactive.")
         parser.print_help()
 
 if __name__ == "__main__":
