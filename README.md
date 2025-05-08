@@ -26,7 +26,7 @@ image_processor/
 │   │   ├── histogram_equalization.py
 │   │   └── edge_detection.py
 │   │
-│   └── main.py
+│   └── photo_editor.py
 │
 ├── tests/
 │   ├── test_filters.py
