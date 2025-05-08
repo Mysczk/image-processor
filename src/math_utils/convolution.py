@@ -16,8 +16,9 @@ def apply_convolution(image, kernel):
     pad_w = kernel_width // 2
 
     # Use scipy for efficient convolution
+    # Use scipy for efficient convolution
     output = signal.convolve2d(image_array, kernel, mode='same', boundary='fill', fillvalue=0)
-    output = signal.convolve2d(image_array, kernel, mode='same', boundary='fill', fillvalue=0)
+    output = np.clip(output, 0, 255).astype(np.uint8)
     output = np.clip(output, 0, 255).astype(np.uint8)
 
     return Image.fromarray(output)
