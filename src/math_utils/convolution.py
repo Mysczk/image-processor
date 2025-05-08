@@ -1,23 +1,5 @@
 import numpy as np
 from PIL import Image
-
-def apply_convolution(image, kernel):
-    # Validate input
-    if not isinstance(image, Image.Image):
-        raise TypeError("Input must be a PIL Image object")
-    if not isinstance(kernel, np.ndarray) or kernel.ndim != 2:
-        raise TypeError("Kernel must be a 2D NumPy array")
-        
-    image_array = np.array(image.convert("L"))  # grayscale
-    kernel_height, kernel_width = kernel.shape
-    # Calculate padding dynamically based on kernel size
-    pad_h = kernel_height // 2
-    pad_w = kernel_width // 2
-    padded_image = np.pad(image_array, ((pad_h, pad_h), (pad_w, pad_w)), mode='constant')
-    
-    # Use scipy for efficient convolution
-import numpy as np
-from PIL import Image
 from scipy import signal
 
 def apply_convolution(image, kernel):
