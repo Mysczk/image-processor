@@ -9,16 +9,8 @@ def apply_convolution(image, kernel):
     if not isinstance(kernel, np.ndarray) or kernel.ndim != 2:
         raise TypeError("Kernel must be a 2D NumPy array")
         
-    image_array = np.array(image.convert("L"))  # grayscale
-    kernel_height, kernel_width = kernel.shape
-    # Calculate padding dynamically based on kernel size
-    pad_h = kernel_height // 2
-    pad_w = kernel_width // 2
-
-    # Use scipy for efficient convolution
-    # Use scipy for efficient convolution
+    image_array = np.array(image.convert("L"))
     output = signal.convolve2d(image_array, kernel, mode='same', boundary='fill', fillvalue=0)
-    output = np.clip(output, 0, 255).astype(np.uint8)
     output = np.clip(output, 0, 255).astype(np.uint8)
 
     return Image.fromarray(output)
