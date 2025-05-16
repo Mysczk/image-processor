@@ -22,18 +22,24 @@ FILTER_MAP = {
     "convolution": ("Convolution (Sharpening)", lambda img: convolution.apply_convolution(img, SHARPEN_KERNEL), "output_convolution.jpg"),
     "5": ("Histogram Equalization", lambda img: histogram_equalization.equalize_histogram(img), "output_hist_eq.jpg"),
     "hist_eq": ("Histogram Equalization", lambda img: histogram_equalization.equalize_histogram(img), "output_hist_eq.jpg"),
-    "6": ("Edge Detection", lambda img: edge_detection.detect_edges(img), "output_edges.jpg"),
-    "edges": ("Edge Detection", lambda img: edge_detection.detect_edges(img), "output_edges.jpg"),
+    "6": ("Edge Detection (Sobel)", lambda img: edge_detection.detect_edges(img, method="sobel"), "output_edges_sobel.jpg"),
+    "edges": ("Edge Detection (Sobel)", lambda img: edge_detection.detect_edges(img, method="sobel"), "output_edges_sobel.jpg"),
+    "sobel": ("Edge Detection (Sobel)", lambda img: edge_detection.detect_edges(img, method="sobel"), "output_edges_sobel.jpg"),
+    "prewitt": ("Edge Detection (Prewitt)", lambda img: edge_detection.detect_edges(img, method="prewitt"), "output_edges_prewitt.jpg"),
+    "scharr": ("Edge Detection (Scharr)", lambda img: edge_detection.detect_edges(img, method="scharr"), "output_edges_scharr.jpg"),
 }
 
 def list_filters():
     print("\nAvailable filters:")
-    # Filter numeric keys and sort them
-    numeric_keys = sorted([k for k in FILTER_MAP.keys() if k.isdigit()],
-                          key=int)
+    numeric_keys = sorted([k for k in FILTER_MAP.keys() if k.isdigit()], key=int)
     for key in numeric_keys:
         label = FILTER_MAP[key][0]
         print(f"{key} - {label}")
+        # Pokud je 6 (edge detection), vypíšeme i dostupné metody
+        if key == "6":
+            print("    sobel   - Edge Detection (Sobel)")
+            print("    prewitt - Edge Detection (Prewitt)")
+            print("    scharr  - Edge Detection (Scharr)")
     print("0 - Start processing\n")
 
 def apply_selected_filters(image, filters, output_dir, logger):
